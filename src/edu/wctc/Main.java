@@ -3,13 +3,71 @@ package edu.wctc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
+
+
     private Scanner keyboard;
     private Cookbook cookbook;
+
+    private static List<MealType> mealTypeList = new ArrayList<>();
+
+    private void doControlBreak() {
+
+        List<Meal> list = cookbook.getMeals();
+
+
+        int count = 0;
+        int max = 0;
+        int min = 0;
+        int total = 0;
+        double mean = 0;
+        int median = 0;
+
+
+        String currentMeal = cookbook.getMeals().get(0).getMealType().getPrettyPrint();
+
+        System.out.printf("%-20s%-20s%-20s%-20s%-20s%-20s%-20s%n", "MealType", "Number of Meals", "Total","Mean", "Min", "Max", "Median");
+
+        for ( Meal meal: list) {
+
+            if (!currentMeal.equals(meal.getMealType().getPrettyPrint())) {
+
+//
+
+
+                System.out.printf("%-20s%-20d%-20d%-20f%-20d%-20d%-20d%n", currentMeal, count, total, mean, min, max, median);
+
+                currentMeal = meal.getMealType().getPrettyPrint();
+
+                count = 0;
+                max = 0;
+                min = 0;
+                total = 0;
+
+
+
+            }
+            count++;
+            if (meal.getCalories() > max) {
+                max = meal.getCalories();
+            }
+            if (min == 0 || meal.getCalories() < min) {
+                min = meal.getCalories();
+            }
+            total += meal.getCalories();
+            mean = total / count;
+
+
+
+        }
+
+        System.out.printf("%-20s%-20d%-20d%-20f%-20d%-20d%-20d", currentMeal, count, total, mean, min, max, median);
+    }
 
 
     public Main() {
@@ -35,12 +93,14 @@ public class Main {
         new Main();
     }
 
+
+
     private void listByMealType() {
         // Default value pre-selected in case
         // something goes wrong w/user choice
         MealType mealType = MealType.DINNER;
 
-        System.out.print("Which meal type? ");
+        System.out.println("Which meal type? ");
 
         // Generate the menu using the ordinal value of the enum
         for (MealType m : MealType.values()) {
@@ -92,7 +152,7 @@ public class Main {
                     searchByName();
                     break;
                 case "4":
-                    // doControlBreak();
+                    doControlBreak();
                     break;
                 case "5":
                     userContinue = false;
@@ -111,3 +171,5 @@ public class Main {
         cookbook.printByNameSearch(ans);
     }
 }
+
+

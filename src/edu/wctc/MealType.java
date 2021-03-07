@@ -1,7 +1,10 @@
 package edu.wctc;
 
 public enum MealType {
-    BREAKFAST("Breakfast"), DESSERT("Dessert"), DINNER("Dinner"), LUNCH("Lunch");
+    BREAKFAST("Breakfast"),
+    DESSERT("Dessert"),
+    DINNER("Dinner"),
+    LUNCH("Lunch");
 
     private String meal;
 
