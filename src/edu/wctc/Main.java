@@ -3,71 +3,74 @@ package edu.wctc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
+
 
 public class Main {
 
 
 
-    private Scanner keyboard;
-    private Cookbook cookbook;
+    private final Scanner keyboard;
+    private final Cookbook cookbook;
 
-    private static List<MealType> mealTypeList = new ArrayList<>();
+    private final static List<MealType> mealTypeList = new ArrayList<>();
+
 
     private void doControlBreak() {
 
-        List<Meal> list = cookbook.getMeals();
+        List<Meal> mealList = cookbook.getMeals();
+        List<MealType> typeOfMeals = Arrays.asList(MealType.values());
 
+        System.out.printf("%-20s%-20s%-20s%-20s%-20s%-20s%n", "Meal Type", "Total", "Mean", "Min", "Max", "Median");
 
         int count = 0;
-        int max = 0;
+        float total = 0;
+        float mean = 0;
         int min = 0;
-        int total = 0;
-        double mean = 0;
+        int max = 0;
         int median = 0;
 
+        for (MealType mealType : typeOfMeals) {
+            List<Meal> listMeals = mealList.stream()
+                    .filter(m -> m.getMealType() == mealType)
+                    .collect(Collectors.toList());
 
-        String currentMeal = cookbook.getMeals().get(0).getMealType().getPrettyPrint();
+            count = listMeals.size();
 
-        System.out.printf("%-20s%-20s%-20s%-20s%-20s%-20s%-20s%n", "MealType", "Number of Meals", "Total","Mean", "Min", "Max", "Median");
+            total = listMeals.stream()
+                    .mapToInt(Meal::getCalories)
+                    .sum();
 
-        for ( Meal meal: list) {
-
-            if (!currentMeal.equals(meal.getMealType().getPrettyPrint())) {
-
-//
-
-
-                System.out.printf("%-20s%-20d%-20d%-20f%-20d%-20d%-20d%n", currentMeal, count, total, mean, min, max, median);
-
-                currentMeal = meal.getMealType().getPrettyPrint();
-
-                count = 0;
-                max = 0;
-                min = 0;
-                total = 0;
-
-
-
-            }
-            count++;
-            if (meal.getCalories() > max) {
-                max = meal.getCalories();
-            }
-            if (min == 0 || meal.getCalories() < min) {
-                min = meal.getCalories();
-            }
-            total += meal.getCalories();
             mean = total / count;
 
+            min = listMeals.stream()
+                    .mapToInt(Meal::getCalories)
+                    .min()
+                    .orElse(0);
 
+            max = listMeals.stream()
+                    .mapToInt(Meal::getCalories)
+                    .max()
+                    .orElse(0);
 
+            List<Meal> medianList = listMeals.stream()
+                    .sorted(Comparator.comparing(Meal::getCalories))
+                    .collect(Collectors.toList());
+
+            if (count % 2 == 0) {
+                median = (medianList.get(count / 2).getCalories() + medianList.get((count / 2) - 1).getCalories()) / 2;
+            } else {
+                median = medianList.get(count / 2).getCalories();
+            }
+
+            System.out.printf("%-20s%-20s%-20s%-20s%-20s%-20s%n", mealType.getPrettyPrint(), total, mean, min, max, median);
         }
 
-        System.out.printf("%-20s%-20d%-20d%-20f%-20d%-20d%-20d", currentMeal, count, total, mean, min, max, median);
     }
+
+
+
 
 
     public Main() {
